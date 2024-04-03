@@ -564,6 +564,10 @@ public class PrisonEscapeGame {
         }
     }
 
+    public void playerBreakDirt(String playerName, double progress) {
+        BukkitMessageSender.sendProgressBar(playerName, progress);
+    }
+
 //	########################################
 //	#            Events Results            #
 //	########################################

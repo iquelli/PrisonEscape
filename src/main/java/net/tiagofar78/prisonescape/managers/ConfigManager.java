@@ -52,6 +52,8 @@ public class ConfigManager {
     private List<PrisonEscapeLocation> _vaultsLocations;
     private List<PrisonEscapeLocation> _chestsLocations;
 
+    private int _dirtBlockMaxDurability;
+
     private double _commonItemsProbability;
     private double _rareItemsProbability;
 
@@ -97,6 +99,8 @@ public class ConfigManager {
         _policeSecretPassageLocations = createLocationsMap(config, "PoliceSecretPassagesLocation");
         _vaultsLocations = createLocationList(config, "VaultsLocations");
         _chestsLocations = createLocationList(config, "ChestsLocations");
+
+        _dirtBlockMaxDurability = config.getInt("DirtBlockMaxDurability");
 
         _commonItemsProbability = config.getDouble("CommonItemsProbability");
         _rareItemsProbability = config.getDouble("RareItemsProbability");
@@ -268,6 +272,10 @@ public class ConfigManager {
 
     public List<PrisonEscapeLocation> getChestsLocations() {
         return _chestsLocations;
+    }
+
+    public int getDirtBlockMaxDurability() {
+        return _dirtBlockMaxDurability;
     }
 
     public double getCommonItemsProbability() {

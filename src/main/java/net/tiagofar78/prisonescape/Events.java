@@ -8,12 +8,17 @@ import net.tiagofar78.prisonescape.game.prisonbuilding.PrisonEscapeLocation;
 import net.tiagofar78.prisonescape.managers.ConfigManager;
 import net.tiagofar78.prisonescape.managers.GameManager;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.BlockDamageEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.FoodLevelChangeEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -26,8 +31,15 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.weather.WeatherChangeEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.metadata.FixedMetadataValue;
 
 public class Events implements Listener {
+
+    private Map<Block, Integer> blockDurabilityMap = new HashMap<>();
+
+//	#########################################
+//	#                 Player                #
+//	#########################################
 
     @EventHandler
     public void playerMove(PlayerMoveEvent e) {
@@ -58,12 +70,27 @@ public class Events implements Listener {
     @EventHandler
     public void playerInteractWithPrison(PlayerInteractEvent e) {
         Block block = e.getClickedBlock();
+        Player player = e.getPlayer();
         if (block == null) {
             return;
         }
 
         PrisonEscapeGame game = GameManager.getGame();
         if (game == null) {
+            return;
+        }
+
+        if (block.getType() == Material.DIRT || block.getType() == Material.GRASS_BLOCK) {
+            int durability = 100;
+            if (blockDurabilityMap.containsKey(block)) {
+                durability = blockDurabilityMap.get(block);
+            } else {
+                blockDurabilityMap.put(block, durability);
+            }
+
+            durability -= 1;
+            double progress = (double) durability / ConfigManager.getInstance().getDirtBlockMaxDurability();
+            game.playerBreakDirt(player.getName(), progress);
             return;
         }
 
@@ -166,13 +193,6 @@ public class Events implements Listener {
     }
 
     @EventHandler
-    public void onWeatherChange(WeatherChangeEvent event) {
-        if (event.toWeatherState()) {
-            event.setCancelled(true);
-        }
-    }
-
-    @EventHandler
     public void onPlayerChat(AsyncPlayerChatEvent event) {
         PrisonEscapeGame game = GameManager.getGame();
         if (game == null) {
@@ -191,5 +211,46 @@ public class Events implements Listener {
 
         event.setCancelled(true);
     }
+
+//	#########################################
+//	#                 World                 #
+//	#########################################
+
+    @EventHandler
+    public void onWeatherChange(WeatherChangeEvent event) {
+        if (event.toWeatherState()) {
+            event.setCancelled(true);
+        }
+    }
+/* 
+    @EventHandler
+    public void onBlockBreak(BlockDamageEvent event) {
+        PrisonEscapeGame game = GameManager.getGame();
+        if (game == null) {
+            return;
+        }
+
+        Player player = event.getPlayer();
+        Block block = event.getBlock();
+
+        if (!player.getWorld().getName().equals(ConfigManager.getInstance().getWorldName())) {
+            return;
+        }
+
+        if ((block.getType() != Material.DIRT) && (block.getType() != Material.GRASS_BLOCK)) {
+            event.setCancelled(true);
+            return;
+        }
+
+        int durability = block.getMetadata("durability").isEmpty() ? 0 : block.getMetadata("durability").get(0).asInt();
+        if (durability > 0) {
+            durability -= 1;
+            block.setMetadata("durability", new FixedMetadataValue(PrisonEscape.getPrisonEscape(), durability));
+
+            double progress = (double) durability / ConfigManager.getInstance().getDirtBlockMaxDurability();
+            game.playerBreakDirt(player.getName(), progress);
+        }
+    }
+*/
 
 }

@@ -3,6 +3,7 @@ package net.tiagofar78.prisonescape.bukkit;
 import net.tiagofar78.prisonescape.game.PrisonEscapePlayer;
 
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 
 import java.util.List;
@@ -62,4 +63,24 @@ public class BukkitMessageSender {
         bukkitPlayer.sendTitle(titleMessage, subtitleMessage, FADE, STAY, FADE);
     }
 
+    public static void sendProgressBar(String playerName, double progress) {
+        Player bukkitPlayer = Bukkit.getPlayer(playerName);
+        if (bukkitPlayer == null || !bukkitPlayer.isOnline()) {
+            return;
+        }
+
+        int barLength = 10; // Length of the progress bar
+        int filledBars = (int) (progress * barLength);
+        StringBuilder progressBar = new StringBuilder();
+        for (int i = 0; i < barLength; i++) {
+            if (i < filledBars) {
+                progressBar.append("█"); // Filled segment
+            } else {
+                progressBar.append(" "); // Empty segment
+            }
+        }
+        String actionBarMessage = ChatColor.translateAlternateColorCodes('&', "&8[&r" + progressBar + "&8]");
+        bukkitPlayer.sendTitle("", actionBarMessage, 0, 40, 10);
+
+    }
 }

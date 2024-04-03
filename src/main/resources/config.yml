@@ -109,6 +109,7 @@ ChestsLocations:
     X: 0
     Y: 0
     Z: 0
+DirtBlockMaxDurability: 100
 CommonItemsProbability: 0.8
 RareItemsProbability: 0.25
 ChestSize: 5
